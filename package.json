@@ -1,6 +1,6 @@
 {
   "name": "pm2-exit-hook",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Run some code when the process exits (supports pm2 clustering)",
   "license": "MIT",
   "repository": "github.com/tapppi/exit-hook",
@@ -8,11 +8,13 @@
     "name": "Tapani Moilanen",
     "email": "moilanen.tapani@gmail.com"
   },
-  "contributors": [{
-    "name": "Sindre Sorhus",
-    "email": "sindresorhus@gmail.com",
-    "url": "http://sindresorhus.com"
-  }],
+  "contributors": [
+    {
+      "name": "Sindre Sorhus",
+      "email": "sindresorhus@gmail.com",
+      "url": "http://sindresorhus.com"
+    }
+  ],
   "engines": {
     "node": ">=0.10.0"
   },
