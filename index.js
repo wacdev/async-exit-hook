@@ -65,5 +65,12 @@ module.exports = function (cb) {
 		process.once('SIGHUP', exit.bind(null, true, 1));
 		process.once('SIGINT', exit.bind(null, true, 2));
 		process.once('SIGTERM', exit.bind(null, true, 15));
+
+		// PM2 Cluster shutdown message
+		process.on('message', function(msg) {
+			if (msg === 'shutdown') {
+				exit(true, -128);
+			}
+		});
 	}
 };
