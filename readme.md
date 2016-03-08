@@ -8,7 +8,7 @@ include async handlers.
 
 Useful for cleaning up.
 
-Supports pm2 cluster mode.
+Forked from [exit-hook](https://npmjs.com/package/exit-hook) Supports pm2 cluster mode.
 
 
 ## Install
