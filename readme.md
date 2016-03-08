@@ -1,4 +1,5 @@
-# pm2-exit-hook [![Build Status](https://api.travis-ci.org/Tapppi/exit-hook.svg?branch=pm2-exit-hook)](https://travis-ci.org/Tapppi/exit-hook)
+# pm2-exit-hook
+[![Build Status](https://api.travis-ci.org/Tapppi/exit-hook.svg?branch=pm2-exit-hook)](https://travis-ci.org/Tapppi/exit-hook)
 
 > Run some code when the process exits
 
