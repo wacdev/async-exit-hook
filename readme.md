@@ -4,9 +4,10 @@
 > Run some code when the process exits
 
 The `process.on('exit')` event doesn't catch all the ways a process can exit. This module catches:
-* process SIGINT, SIGTERM and SIGHUP signals
-* process beforeExit and exit events
-* PM2 clustering process shutdown message ([PM2 graceful reload]()
+
+* process SIGINT, SIGTERM and SIGHUP signals  
+* process beforeExit and exit events  
+* PM2 clustering process shutdown message ([PM2 graceful reload](http://pm2.keymetrics.io/docs/usage/cluster-mode/#graceful-reload))  
 
 Useful for cleaning up. You can also include async handlers.
 
