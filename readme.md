@@ -3,10 +3,12 @@
 
 > Run some code when the process exits
 
-The `process.on('exit')` event doesn't catch all the ways a process can exit. You can also
-include async handlers.
+The `process.on('exit')` event doesn't catch all the ways a process can exit. This module catches:
+* process SIGINT, SIGTERM and SIGHUP signals
+* process beforeExit and exit events
+* PM2 clustering process shutdown message ([PM2 graceful reload]()
 
-Useful for cleaning up.
+Useful for cleaning up. You can also include async handlers.
 
 Forked from [exit-hook](https://npmjs.com/package/exit-hook) Supports pm2 cluster mode.
 
@@ -49,6 +51,7 @@ throw new Error('unicorns');
 
 //=> 'exiting'
 //=> 'exiting 2'
+//=> 'exiting 3'
 ```
 
 
