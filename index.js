@@ -1,39 +1,59 @@
 'use strict';
 
-var cbs = [];
+var hooks = [];
+var errHooks = [];
 var called = false;
 var waitingFor = 0;
-var forceTimeout = null;
+var asyncTimeoutMs = 10000;
 
-function exit(exit, signal) {
+function exit(exit, code, err) {
+	// Only execute hooks once
 	if (called) {
 		return;
 	}
 
 	called = true;
 
-	cbs.forEach(function (el) {
-		// can only perform async ops on SIGINT/SIGTERM
-		if (exit && el.length) {
-			// el expects a callback
-			waitingFor++;
-
-			el(stepTowardExit);
-		}
-		else {
-			el();
-		}
-	});
+	// Run hooks
+	if (err) {
+		// Uncaught exception, run error hooks
+		errHooks.map(runHook.bind(null, 1, err));
+	}
+	hooks.map(runHook.bind(null, 0, null));
 
 	if (!waitingFor) {
+		// No asynchronous hooks, exit immediately
 		doExit();
 	} else {
-		// Timeout to force exit after 10 seconds
-		forceTimeout = setTimeout(function() {
+		// Force exit after x ms (10000 by default), even if async hooks in progress
+		setTimeout(function() {
 			doExit();
-		}, 10000);
+		}, asyncTimeoutMs);
 	}
 
+	// Runs a single hook
+	function runHook(syncArgCount, err, hook) {
+		// cannot perform async hooks in `exit` event
+		if (exit && hook.length > syncArgCount) {
+			// hook is async, expects a finish callback
+			waitingFor++;
+
+			if (err) {
+				// Pass error, calling uncaught exception handlers
+				return hook(err, stepTowardExit);
+			}
+			return hook(stepTowardExit);
+		}
+
+		// hook is synchronous
+		if (err) {
+			// Pass error, calling uncaught exception handlers
+			return hook(err);
+		}
+		return hook();
+	}
+
+	// Async hook callback, decrements waiting counter
 	function stepTowardExit() {
 		process.nextTick(function() {
 			if (--waitingFor === 0) {
@@ -48,29 +68,47 @@ function exit(exit, signal) {
 			return;
 		}
 		doExitDone = true;
-		clearTimeout(forceTimeout);
 
 		if (exit === true) {
-			process.exit(128 + signal);
+			// All handlers should be called even if the exit-hook handler was registered first
+			process.nextTick(process.exit.bind(code));
 		}
 	}
 }
 
-module.exports = function (cb) {
-	cbs.push(cb);
+// Add a hook
+function add(hook) {
+	hooks.push(hook);
 
-	if (cbs.length === 1) {
+	if (hooks.length === 1) {
 		process.once('exit', exit);
-		process.once('beforeExit', exit.bind(null, true, -128));
-		process.once('SIGHUP', exit.bind(null, true, 1));
-		process.once('SIGINT', exit.bind(null, true, 2));
-		process.once('SIGTERM', exit.bind(null, true, 15));
+		process.once('beforeExit', exit.bind(null, true, 0));
+		process.once('SIGHUP', exit.bind(null, true, 128 + 1));
+		process.once('SIGINT', exit.bind(null, true, 128 + 2));
+		process.once('SIGTERM', exit.bind(null, true, 128 + 15));
 
 		// PM2 Cluster shutdown message
 		process.on('message', function(msg) {
 			if (msg === 'shutdown') {
-				exit(true, -128);
+				exit(true, 0);
 			}
 		});
 	}
+}
+
+// Add an uncaught exception handler
+add.uncaughtExceptionHandler = function(hook) {
+	errHooks.push(hook);
+
+	if (errHooks.length === 1) {
+		process.once('uncaughtException', exit.bind(null, true, 1));
+	}
 };
+
+// Configure async force exit timeout
+add.forceExitTimeout = function(ms) {
+	asyncTimeoutMs = ms;
+};
+
+// Export
+module.exports = add;
