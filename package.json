@@ -1,6 +1,6 @@
 {
   "name": "async-exit-hook",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Run some code when the process exits (supports async hooks andpm2 clustering)",
   "license": "MIT",
   "repository": {
