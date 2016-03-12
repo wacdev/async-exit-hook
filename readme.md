@@ -20,7 +20,6 @@ Forked and pretty much rewritten from [exit-hook](https://npmjs.com/package/exit
 $ npm install --save async-exit-hook
 ```
 
-
 ## Usage
 **If you use asynchronous exit hooks, DO NOT use `process.exit()` to exit.
 The `exit` event DOES NOT support asynchronous code.**
@@ -34,7 +33,7 @@ On windows `process.kill('SIGINT')` does not work fire signal events, and as suc
 to gracefully exit.
 
 ```js
-const exitHook = require('exit-hook');
+const exitHook = require('async-exit-hook');
 
 exitHook(() => {
     console.log('exiting');
@@ -54,10 +53,17 @@ exitHook(callback => {
 });
 
 // You can hook uncaught errors with uncaughtExceptionHandler(), consequently adding 
-// async support to uncaught errors (normally uncaught errors result in a synchronous exit)
-exitHook.uncaughtExceptionHandler(err => {
-	console.error(err);
-	// Log to rollbar or whatever
+// async support to uncaught errors (normally uncaught errors result in a synchronous exit).
+// Add the second parameter (callback) to indicate async hooks
+exitHook.uncaughtExceptionHandler((err, callback) => {
+    console.error(err);
+    // Log to rollbar or whatever
+    rollbar.handleError(err => {
+        if (err) {
+            console.error(err);
+        }
+        callback();
+    });
 });
 
 // You can hook uncaught errors with uncaughtErrorHandler(), consequently adding 
