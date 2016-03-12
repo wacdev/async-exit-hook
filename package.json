@@ -1,6 +1,6 @@
 {
   "name": "pm2-exit-hook",
-  "version": "2.0.4",
+  "version": "2.0.5",
   "description": "Deprecated, use async-exit-hook instead",
   "license": "MIT",
   "repository": {
