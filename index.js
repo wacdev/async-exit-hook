@@ -125,7 +125,6 @@ add.hookEvent = function(event, code, filter) {
 
 // Unhook signal / event
 add.unhookEvent = function(event) {
-	console.log('unhookevent: ' + event);
 	process.removeListener(event, events[event]);
 	delete events[event];
 	delete filters[event];
