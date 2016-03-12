@@ -46,6 +46,26 @@ function testInSub(test, signal) {
 	});
 }
 
+test('API: test adding and removing and listing hooks', t => {
+	const exitHook = require('./../');
+	t.plan(3);
+
+	// Enable hooks
+	exitHook(() => {});
+
+	// Ensure SIGBREAK hook
+	exitHook.hookEvent('SIGBREAK', 128 + 21);
+	t.not(exitHook.hookedEvents().indexOf('SIGBREAK'), -1);
+
+	// Unhook SIGBREAK
+	exitHook.unhookEvent('SIGBREAK');
+	t.is(exitHook.hookedEvents().indexOf('SIGBREAK'), -1);
+
+	// Rehook SIGBREAK
+	exitHook.hookEvent('SIGBREAK', 128 + 21);
+	t.not(exitHook.hookedEvents().indexOf('SIGBREAK'), -1);
+});
+
 test('sync handlers', t => {
 	t.plan(2);
 	return testInSub('sync', 'shutdown')

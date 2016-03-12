@@ -125,9 +125,21 @@ add.hookEvent = function(event, code, filter) {
 
 // Unhook signal / event
 add.unhookEvent = function(event) {
-	process.removeEventListener(event, events[event]);
-	events[event] = undefined;
-	filters[event] = undefined;
+	console.log('unhookevent: ' + event);
+	process.removeListener(event, events[event]);
+	delete events[event];
+	delete filters[event];
+};
+
+// List hooked events
+add.hookedEvents = function() {
+	var ret = [];
+	for (var name in events) {
+		if (events.hasOwnProperty(name)) {
+			ret.push(name);
+		}
+	}
+	return ret;
 };
 
 // Add an uncaught exception handler
