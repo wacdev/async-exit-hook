@@ -1,11 +1,11 @@
 {
   "name": "pm2-exit-hook",
   "version": "2.0.4",
-  "description": "Run some code when the process exits (supports pm2 clustering)",
+  "description": "Deprecated, use async-exit-hook instead",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/tapppi/exit-hook.git"
+    "url": "https://github.com/tapppi/async-exit-hook.git"
   },
   "author": {
     "name": "Tapani Moilanen",
