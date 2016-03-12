@@ -6,6 +6,9 @@ var called = false;
 var waitingFor = 0;
 var asyncTimeoutMs = 10000;
 
+var events = [];
+var filters = [];
+
 function exit(exit, code, err) {
 	// Only execute hooks once
 	if (called) {
@@ -81,20 +84,48 @@ function add(hook) {
 	hooks.push(hook);
 
 	if (hooks.length === 1) {
-		process.once('exit', exit);
-		process.once('beforeExit', exit.bind(null, true, 0));
-		process.once('SIGHUP', exit.bind(null, true, 128 + 1));
-		process.once('SIGINT', exit.bind(null, true, 128 + 2));
-		process.once('SIGTERM', exit.bind(null, true, 128 + 15));
+		add.hookEvent('exit');
+		add.hookEvent('beforeExit', 0);
+		add.hookEvent('SIGHUP', 128 + 1);
+		add.hookEvent('SIGINT', 128 + 2);
+		add.hookEvent('SIGTERM', 128 + 15);
 
 		// PM2 Cluster shutdown message
-		process.on('message', function(msg) {
-			if (msg === 'shutdown') {
-				exit(true, 0);
+		add.hookEvent('message', 0, function(msg) {
+			if (msg !== 'shutdown') {
+				return true;
 			}
 		});
 	}
 }
+
+// New signal / event to hook
+add.hookEvent = function(event, code, filter) {
+	events[event] = function() {
+		for (var i = 0; i < filters.length; i++) {
+			if (filters[i].apply(this, arguments)) {
+				return;
+			}
+		}
+		exit(code != null, code);
+	};
+
+	if (!filters[event]) {
+		filters[event] = [];
+	}
+
+	if (filter) {
+		filters[event].push(filter);
+	}
+	process.on(event, events[event]);
+};
+
+// Unhook signal / event
+add.unhookEvent = function(event) {
+	process.removeEventListener(event, events[event]);
+	events[event] = undefined;
+	filters[event] = undefined;
+};
 
 // Add an uncaught exception handler
 add.uncaughtExceptionHandler = function(hook) {
