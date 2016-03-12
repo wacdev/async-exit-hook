@@ -1,6 +1,6 @@
 {
   "name": "pm2-exit-hook",
-  "version": "2.0.3",
+  "version": "2.0.4",
   "description": "Run some code when the process exits (supports pm2 clustering)",
   "license": "MIT",
   "repository": {
