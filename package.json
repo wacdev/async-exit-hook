@@ -1,11 +1,11 @@
 {
-  "name": "pm2-exit-hook",
-  "version": "2.0.3",
+  "name": "async-exit-hook",
+  "version": "1.0.0",
   "description": "Run some code when the process exits (supports pm2 clustering)",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/tapppi/exit-hook.git"
+    "url": "https://github.com/tapppi/async-exit-hook.git"
   },
   "author": {
     "name": "Tapani Moilanen",
@@ -29,7 +29,6 @@
     "index.js"
   ],
   "keywords": [
-    "pm2",
     "exit",
     "quit",
     "process",
@@ -40,6 +39,11 @@
     "sigterm",
     "sigint",
     "sighup",
+    "pm2",
+    "cluster",
+    "child",
+    "reload",
+    "async",
     "terminate",
     "kill",
     "stop",
