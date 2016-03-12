@@ -60,6 +60,8 @@ exitHook.uncaughtExceptionHandler(err => {
 	// Log to rollbar or whatever
 });
 
+// You can hook uncaught errors with uncaughtErrorHandler(), consequently adding 
+// async support to uncaught errors (normally uncaught errors result in a synchronous exit)
 throw new Error('unicorns');
 
 //=> 'exiting'
