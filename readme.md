@@ -70,13 +70,14 @@ exitHook.uncaughtExceptionHandler(err => {
 // You can add multiple uncaught error handlers
 // Add the second parameter (callback) to indicate async hooks
 exitHook.uncaughtExceptionHandler((err, callback) => {
-    sendErrorToCloudOrWhatever(err, success => {
-        if (err) {
-            console.error('Error sending to cloud: ', err.stack);
-        } else {
-            console.log('Sent err to cloud');
-        }
-        callback();
+    sendErrorToCloudOrWhatever(err) // Returns promise
+        .then(() => { 
+             console.log('Sent err to cloud'); 
+         });
+        .catch(sendError => {
+             console.error('Error sending to cloud: ', err.stack));
+        })
+        .then(() => callback);
     });
 });
 
