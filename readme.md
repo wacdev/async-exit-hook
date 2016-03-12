@@ -1,5 +1,6 @@
 # async-exit-hook
 [![Build Status](https://api.travis-ci.org/Tapppi/async-exit-hook.svg)](https://travis-ci.org/Tapppi/async-exit-hook)
+[![Coverage Status](https://coveralls.io/repos/github/Tapppi/async-exit-hook/badge.svg?branch=master)](https://coveralls.io/github/Tapppi/async-exit-hook?branch=master)
 
 > Run some code when the process exits
 
@@ -107,5 +108,5 @@ throw new Error('awesome');
 
 ## License
 
-MIT © Tapani Moilanen
+MIT © Tapani Moilanen  
 MIT © [Sindre Sorhus](http://sindresorhus.com)
