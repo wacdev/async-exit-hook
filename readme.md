@@ -21,17 +21,25 @@ $ npm install --save async-exit-hook
 ```
 
 ## Usage
+
+### Considerations and warning
+#### On `process.exit()` and asynchronous code
 **If you use asynchronous exit hooks, DO NOT use `process.exit()` to exit.
 The `exit` event DOES NOT support asynchronous code.**
 >['beforeExit' is not emitted for conditions causing explicit termination, such as process.exit()]
 (https://nodejs.org/api/process.html#process_event_beforeexit)
 
+#### Windows and `process.kill(signal)`
+On windows `process.kill(signal)` immediately kills the process, and does not fire signal events, 
+and as such, cannot be used to gracefully exit. See *Clustering and child processes* for a
+workaround when killing child processes. I'm planning to support gracefully exiting 
+with async support on windows soon.
+
+### Clustering and child processes
 If you use custom clustering / child processes, you can gracefully shutdown your child process
 by sending a shutdown message (`childProc.send('shutdown')`).
 
-On windows `process.kill('SIGINT')` does not work fire signal events, and as such, cannot be used
-to gracefully exit.
-
+### Example
 ```js
 const exitHook = require('async-exit-hook');
 
@@ -54,22 +62,38 @@ exitHook(callback => {
 
 // You can hook uncaught errors with uncaughtExceptionHandler(), consequently adding 
 // async support to uncaught errors (normally uncaught errors result in a synchronous exit).
+exitHook.uncaughtExceptionHandler(err => {
+    console.error(err);
+});
+
+// You can add multiple uncaught error handlers
 // Add the second parameter (callback) to indicate async hooks
 exitHook.uncaughtExceptionHandler((err, callback) => {
-    console.error(err);
-    // Log to rollbar or whatever
-    rollbar.handleError(err => {
+    sendErrorToCloudOrWhatever(err, success => {
         if (err) {
-            console.error(err);
+            console.error('Error sending to cloud: ', err.stack);
+        } else {
+            console.log('Sent err to cloud');
         }
         callback();
     });
 });
 
-// You can hook uncaught errors with uncaughtErrorHandler(), consequently adding 
-// async support to uncaught errors (normally uncaught errors result in a synchronous exit)
-throw new Error('unicorns');
+// Add exit hooks for a signal or custom message:
 
+// Arguments are `signal, exitCode`
+exitHook.hookEvent('SIGBREAK', 21);
+
+// process event: `message` with a filter
+// filter gets all arguments passed to *handler*: `process.on(message, *handler*)`
+// Exits on process event `message` with msg `customShutdownMessage` only
+exitHook.hookEvent('message', 0, msg => msg !== 'customShutdownMessage');
+
+// All async hooks will work with uncaught errors when you have specified an uncaughtExceptionHandler
+throw new Error('awesome');
+
+//=> '[Error: awesome]'
+//=> 'Sent error to cloud'
 //=> 'exiting'
 //=> 'exiting 2'
 //=> 'exiting 3'
@@ -78,4 +102,5 @@ throw new Error('unicorns');
 
 ## License
 
+MIT © Tapani Moilanen
 MIT © [Sindre Sorhus](http://sindresorhus.com)
