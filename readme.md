@@ -5,7 +5,7 @@
 
 The `process.on('exit')` event doesn't catch all the ways a process can exit. This module catches:
 
-* process SIGINT, SIGTERM and SIGHUP signals  
+* process SIGINT, SIGTERM and SIGHUP, SIGBREAK signals  
 * process beforeExit and exit events  
 * PM2 clustering process shutdown message ([PM2 graceful reload](http://pm2.keymetrics.io/docs/usage/cluster-mode/#graceful-reload))  
 
@@ -81,7 +81,8 @@ exitHook.uncaughtExceptionHandler((err, callback) => {
 
 // Add exit hooks for a signal or custom message:
 
-// Arguments are `signal, exitCode`
+// Custom signal
+// Arguments are `signal, exitCode` (SIGBREAK is already handled, this is an example)
 exitHook.hookEvent('SIGBREAK', 21);
 
 // process event: `message` with a filter
