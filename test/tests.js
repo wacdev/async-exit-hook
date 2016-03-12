@@ -11,6 +11,7 @@ var path = require('path');
  *
  * @async
  * @param {String} test Filename without path or extension
+ * @param {String} signal Signal (or 'shutdown' for message) to send to the process
  * @return {Promise.<[Number, String]>} Array with the exit code and output of the subprocess
  */
 function testInSub(test, signal) {
