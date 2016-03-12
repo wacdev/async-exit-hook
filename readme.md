@@ -92,10 +92,14 @@ exitHook.hookEvent('message', 0, msg => msg !== 'customShutdownMessage');
 // All async hooks will work with uncaught errors when you have specified an uncaughtExceptionHandler
 throw new Error('awesome');
 
+//=> // Sync uncaughtExcpetion hooks called and retun
 //=> '[Error: awesome]'
-//=> 'Sent error to cloud'
+//=> // Sync hooks called and retun
 //=> 'exiting'
 //=> 'exiting 2'
+//=> // Async uncaughtException hooks return
+//=> 'Sent error to cloud'
+//=> // Sync uncaughtException hooks return
 //=> 'exiting 3'
 ```
 
