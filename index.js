@@ -90,7 +90,9 @@ function add(hook) {
 		add.hookEvent('SIGINT', 128 + 2);
 		add.hookEvent('SIGTERM', 128 + 15);
 
-		// PM2 Cluster shutdown message
+		// PM2 Cluster shutdown message. Caught to support async handlers with pm2, needed because
+		// explicitly calling process.exit() doesn't trigger the beforeExit event, and the exit
+		// event cannot support async handlers, since the event loop is never called after it.
 		add.hookEvent('message', 0, function(msg) {
 			if (msg !== 'shutdown') {
 				return true;
