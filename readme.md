@@ -1,60 +1,6 @@
 # pm2-exit-hook
-[![Build Status](https://api.travis-ci.org/Tapppi/exit-hook.svg?branch=pm2-exit-hook)](https://travis-ci.org/Tapppi/exit-hook)
 
-> Run some code when the process exits
-
-The `process.on('exit')` event doesn't catch all the ways a process can exit. This module catches:
-
-* process SIGINT, SIGTERM and SIGHUP signals  
-* process beforeExit and exit events  
-* PM2 clustering process shutdown message ([PM2 graceful reload](http://pm2.keymetrics.io/docs/usage/cluster-mode/#graceful-reload))  
-
-Useful for cleaning up. You can also include async handlers.
-
-Forked from [exit-hook](https://npmjs.com/package/exit-hook) Supports pm2 cluster mode.
-
-
-## Install
-
-```
-$ npm install --save pm2-exit-hook
-```
-
-
-## Usage
-
-```js
-const exitHook = require('exit-hook');
-
-exitHook(() => {
-	console.log('exiting');
-});
-
-// you can add multiple hooks, even across files
-exitHook(() => {
-	console.log('exiting 2');
-});
-
-// you can add multiple hooks, even across files
-exitHook(() => {
-	console.log('exiting 2');
-});
-
-// you can add async hooks by accepting a callback
-exitHook(callback => {
-	setTimeout(() => {
-		console.log('exiting 3');
-		callback();
-	}, 1000);
-});
-
-throw new Error('unicorns');
-
-//=> 'exiting'
-//=> 'exiting 2'
-//=> 'exiting 3'
-```
-
+** DEPRECATED in favor of [async-exit-hook](https://www.npmjs.com/package/async-exit-hook)**
 
 ## License
 
