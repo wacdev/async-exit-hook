@@ -1,9 +1,10 @@
 // Tests have to happen in a subprocess to test the exit functionality
 'use strict';
 
-var test = require('ava');
 var fork = require('child_process').fork;
 var path = require('path');
+
+var test = require('ava');
 
 /**
  * Starts a test file in a subprocess, returns a promise that resolves with the subprocess
@@ -26,11 +27,11 @@ function testInSub(test, signal) {
 
 		var output = '';
 
-		proc.stdout.on('data', function(data) {
+		proc.stdout.on('data', function (data) {
 			output += data.toString();
 		});
 
-		proc.stderr.on('data', function(data) {
+		proc.stderr.on('data', function (data) {
 			output += data.toString();
 		});
 
@@ -47,7 +48,8 @@ function testInSub(test, signal) {
 }
 
 test('API: test adding and removing and listing hooks', t => {
-	const exitHook = require('./../');
+	var exitHook = require('./../');
+
 	t.plan(3);
 
 	// Enable hooks
@@ -86,7 +88,7 @@ test('async handlers', t => {
 
 test('async uncaught exception handler', t => {
 	t.plan(2);
-	return testInSub('asyncErr')
+	return testInSub('async-err')
 		.then(([code, output]) => {
 			t.is(output, 'SUCCESS');
 			t.is(code, 0);
@@ -95,7 +97,7 @@ test('async uncaught exception handler', t => {
 
 test('async exit timeout', t => {
 	t.plan(2);
-	return testInSub('asyncExitTimeout')
+	return testInSub('async-exit-timeout')
 		.then(([code, output]) => {
 			t.is(output, 'SUCCESS');
 			t.is(code, 0);

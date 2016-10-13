@@ -2,20 +2,21 @@
 var exitHook = require('./../../index');
 var stub = require('./stub');
 
-exitHook(function(cb) {
-	setTimeout(function() {
+exitHook(function (cb) {
+	setTimeout(function () {
 		stub.called();
 		cb();
 	}, 2000);
 	stub.called();
 });
 
-exitHook(function() {
+exitHook(function () {
 	stub.called();
 });
 
-exitHook.uncaughtExceptionHandler(function(err, cb) {
-	setTimeout(function() {
+// eslint-disable-next-line handle-callback-err
+exitHook.uncaughtExceptionHandler(function (err, cb) {
+	setTimeout(function () {
 		stub.called();
 		cb();
 	}, 2000);

@@ -2,15 +2,15 @@
 var exitHook = require('./../../index');
 var stub = require('./stub');
 
-exitHook(function(cb) {
-	setTimeout(function() {
+exitHook(function (cb) {
+	setTimeout(function () {
 		stub.called();
 		cb();
 	}, 50);
 	stub.called();
 });
 
-exitHook(function() {
+exitHook(function () {
 	stub.called();
 });
 

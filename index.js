@@ -24,14 +24,14 @@ function exit(exit, code, err) {
 	}
 	hooks.map(runHook.bind(null, 0, null));
 
-	if (!waitingFor) {
-		// No asynchronous hooks, exit immediately
-		doExit();
-	} else {
+	if (waitingFor) {
 		// Force exit after x ms (10000 by default), even if async hooks in progress
-		setTimeout(function() {
+		setTimeout(function () {
 			doExit();
 		}, asyncTimeoutMs);
+	} else {
+		// No asynchronous hooks, exit immediately
+		doExit();
 	}
 
 	// Runs a single hook
@@ -58,7 +58,7 @@ function exit(exit, code, err) {
 
 	// Async hook callback, decrements waiting counter
 	function stepTowardExit() {
-		process.nextTick(function() {
+		process.nextTick(function () {
 			if (--waitingFor === 0) {
 				doExit();
 			}
@@ -66,6 +66,7 @@ function exit(exit, code, err) {
 	}
 
 	var doExitDone = false;
+
 	function doExit() {
 		if (doExitDone) {
 			return;
@@ -94,7 +95,7 @@ function add(hook) {
 		// PM2 Cluster shutdown message. Caught to support async handlers with pm2, needed because
 		// explicitly calling process.exit() doesn't trigger the beforeExit event, and the exit
 		// event cannot support async handlers, since the event loop is never called after it.
-		add.hookEvent('message', 0, function(msg) {
+		add.hookEvent('message', 0, function (msg) {
 			if (msg !== 'shutdown') {
 				return true;
 			}
@@ -103,14 +104,14 @@ function add(hook) {
 }
 
 // New signal / event to hook
-add.hookEvent = function(event, code, filter) {
-	events[event] = function() {
+add.hookEvent = function (event, code, filter) {
+	events[event] = function () {
 		for (var i = 0; i < filters.length; i++) {
 			if (filters[i].apply(this, arguments)) {
 				return;
 			}
 		}
-		exit(code != null, code);
+		exit(code !== undefined && code !== null, code);
 	};
 
 	if (!filters[event]) {
@@ -124,17 +125,17 @@ add.hookEvent = function(event, code, filter) {
 };
 
 // Unhook signal / event
-add.unhookEvent = function(event) {
+add.unhookEvent = function (event) {
 	process.removeListener(event, events[event]);
 	delete events[event];
 	delete filters[event];
 };
 
 // List hooked events
-add.hookedEvents = function() {
+add.hookedEvents = function () {
 	var ret = [];
 	for (var name in events) {
-		if (events.hasOwnProperty(name)) {
+		if ({}.hasOwnProperty.call(events, name)) {
 			ret.push(name);
 		}
 	}
@@ -142,7 +143,7 @@ add.hookedEvents = function() {
 };
 
 // Add an uncaught exception handler
-add.uncaughtExceptionHandler = function(hook) {
+add.uncaughtExceptionHandler = function (hook) {
 	errHooks.push(hook);
 
 	if (errHooks.length === 1) {
@@ -151,7 +152,7 @@ add.uncaughtExceptionHandler = function(hook) {
 };
 
 // Configure async force exit timeout
-add.forceExitTimeout = function(ms) {
+add.forceExitTimeout = function (ms) {
 	asyncTimeoutMs = ms;
 };
 
