@@ -18,7 +18,7 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### BREAKING CHANGES
 
-* node 0.12 not supported anymore
+* node 0.12 not tested anymore
 
 
 
