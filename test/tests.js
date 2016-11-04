@@ -103,3 +103,12 @@ test('async exit timeout', t => {
 			t.is(code, 0);
 		});
 });
+
+test('unhandled promise rejection', t => {
+	t.plan(2);
+	return testInSub('unhandled-promise')
+		.then(([code, output]) => {
+			t.is(output, 'SUCCESS');
+			t.is(code, 0);
+		});
+});
