@@ -6,8 +6,8 @@ var called = false;
 var waitingFor = 0;
 var asyncTimeoutMs = 10000;
 
-var events = [];
-var filters = [];
+var events = {};
+var filters = {};
 
 function exit(exit, code, err) {
 	// Only execute hooks once
@@ -106,8 +106,9 @@ function add(hook) {
 // New signal / event to hook
 add.hookEvent = function (event, code, filter) {
 	events[event] = function () {
-		for (var i = 0; i < filters.length; i++) {
-			if (filters[i].apply(this, arguments)) {
+		const eventFilters = filters[event];
+		for (var i = 0; i < eventFilters.length; i++) {
+			if (eventFilters[i].apply(this, arguments)) {
 				return;
 			}
 		}
