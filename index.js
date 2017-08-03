@@ -1,15 +1,61 @@
 'use strict';
 
-var hooks = [];
-var errHooks = [];
-var called = false;
-var waitingFor = 0;
-var asyncTimeoutMs = 10000;
+const hooks = [];
+const errHooks = [];
+let called = false;
+let waitingFor = 0;
+let asyncTimeoutMs = 10000;
 
-var events = {};
-var filters = {};
+const events = {};
+const filters = {};
 
 function exit(exit, code, err) {
+	// Helper functions
+	let doExitDone = false;
+
+	function doExit() {
+		if (doExitDone) {
+			return;
+		}
+		doExitDone = true;
+
+		if (exit === true) {
+			// All handlers should be called even if the exit-hook handler was registered first
+			process.nextTick(process.exit.bind(null, code));
+		}
+	}
+
+	// Async hook callback, decrements waiting counter
+	function stepTowardExit() {
+		process.nextTick(() => {
+			if (--waitingFor === 0) {
+				doExit();
+			}
+		});
+	}
+
+	// Runs a single hook
+	function runHook(syncArgCount, err, hook) {
+		// Cannot perform async hooks in `exit` event
+		if (exit && hook.length > syncArgCount) {
+			// Hook is async, expects a finish callback
+			waitingFor++;
+
+			if (err) {
+				// Pass error, calling uncaught exception handlers
+				return hook(err, stepTowardExit);
+			}
+			return hook(stepTowardExit);
+		}
+
+		// Hook is synchronous
+		if (err) {
+			// Pass error, calling uncaught exception handlers
+			return hook(err);
+		}
+		return hook();
+	}
+
 	// Only execute hooks once
 	if (called) {
 		return;
@@ -26,57 +72,12 @@ function exit(exit, code, err) {
 
 	if (waitingFor) {
 		// Force exit after x ms (10000 by default), even if async hooks in progress
-		setTimeout(function () {
+		setTimeout(() => {
 			doExit();
 		}, asyncTimeoutMs);
 	} else {
 		// No asynchronous hooks, exit immediately
 		doExit();
-	}
-
-	// Runs a single hook
-	function runHook(syncArgCount, err, hook) {
-		// cannot perform async hooks in `exit` event
-		if (exit && hook.length > syncArgCount) {
-			// hook is async, expects a finish callback
-			waitingFor++;
-
-			if (err) {
-				// Pass error, calling uncaught exception handlers
-				return hook(err, stepTowardExit);
-			}
-			return hook(stepTowardExit);
-		}
-
-		// hook is synchronous
-		if (err) {
-			// Pass error, calling uncaught exception handlers
-			return hook(err);
-		}
-		return hook();
-	}
-
-	// Async hook callback, decrements waiting counter
-	function stepTowardExit() {
-		process.nextTick(function () {
-			if (--waitingFor === 0) {
-				doExit();
-			}
-		});
-	}
-
-	var doExitDone = false;
-
-	function doExit() {
-		if (doExitDone) {
-			return;
-		}
-		doExitDone = true;
-
-		if (exit === true) {
-			// All handlers should be called even if the exit-hook handler was registered first
-			process.nextTick(process.exit.bind(null, code));
-		}
 	}
 }
 
@@ -95,7 +96,7 @@ function add(hook) {
 		// PM2 Cluster shutdown message. Caught to support async handlers with pm2, needed because
 		// explicitly calling process.exit() doesn't trigger the beforeExit event, and the exit
 		// event cannot support async handlers, since the event loop is never called after it.
-		add.hookEvent('message', 0, function (msg) {
+		add.hookEvent('message', 0, function (msg) { // eslint-disable-line prefer-arrow-callback
 			if (msg !== 'shutdown') {
 				return true;
 			}
@@ -107,7 +108,7 @@ function add(hook) {
 add.hookEvent = function (event, code, filter) {
 	events[event] = function () {
 		const eventFilters = filters[event];
-		for (var i = 0; i < eventFilters.length; i++) {
+		for (let i = 0; i < eventFilters.length; i++) {
 			if (eventFilters[i].apply(this, arguments)) {
 				return;
 			}
@@ -134,8 +135,8 @@ add.unhookEvent = function (event) {
 
 // List hooked events
 add.hookedEvents = function () {
-	var ret = [];
-	for (var name in events) {
+	const ret = [];
+	for (const name in events) {
 		if ({}.hasOwnProperty.call(events, name)) {
 			ret.push(name);
 		}

@@ -1,16 +1,16 @@
 'use strict';
-var exitHook = require('./../../index');
-var stub = require('./stub');
+const exitHook = require('./../../index');
+const stub = require('./stub');
 
-exitHook(function (cb) {
-	setTimeout(function () {
+exitHook(cb => {
+	setTimeout(() => {
 		stub.called();
 		cb();
 	}, 50);
 	stub.called();
 });
 
-exitHook(function () {
+exitHook(() => {
 	stub.called();
 });
 

@@ -1,22 +1,22 @@
 'use strict';
-var exitHook = require('./../../index');
-var stub = require('./stub');
+const exitHook = require('./../../index');
+const stub = require('./stub');
 
-exitHook(function (cb) {
-	setTimeout(function () {
+exitHook(cb => {
+	setTimeout(() => {
 		stub.called();
 		cb();
 	}, 2000);
 	stub.called();
 });
 
-exitHook(function () {
+exitHook(() => {
 	stub.called();
 });
 
 // eslint-disable-next-line handle-callback-err
-exitHook.uncaughtExceptionHandler(function (err, cb) {
-	setTimeout(function () {
+exitHook.uncaughtExceptionHandler((err, cb) => {
+	setTimeout(() => {
 		stub.called();
 		cb();
 	}, 2000);

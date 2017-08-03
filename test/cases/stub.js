@@ -1,43 +1,43 @@
 // Stub to make sure that the required callbacks are called by exit-hook
 
-var c = 0;
-var noCallback = true;
+let c = 0;
+let noCallback = true;
 
 // Increment the called count
-exports.called = function () {
+exports.called = () => {
 	c++;
 };
 
 // Exit with error
-exports.reject = function (s, code) {
+exports.reject = (s, code) => {
 	process.stdout.write('FAILURE: ' + s);
-	// eslint-disable-next-line xo/no-process-exit
+	// eslint-disable-next-line unicorn/no-process-exit
 	process.exit(code === null || code === undefined ? 1 : code);
 };
 
 // Exit with success
-exports.done = function () {
+exports.done = () => {
 	process.stdout.write('SUCCESS');
-	// eslint-disable-next-line xo/no-process-exit
+	// eslint-disable-next-line unicorn/no-process-exit
 	process.exit(0);
 };
 
 // Add the exit check with a specific expected called count
-exports.addCheck = function (num) {
+exports.addCheck = num => {
 	noCallback = false;
 
 	// Only call exit once, and save uncaught errors
-	var called = false;
-	var ucErrStr;
+	let called = false;
+	let ucErrStr;
 
 	// Save errors that do not start with 'test'
-	process.on('uncaughtException', function (err) {
+	process.on('uncaughtException', err => {
 		if (err.message.indexOf('test') !== 0) {
 			ucErrStr = err.stack;
 		}
 	});
 	// Save rejections that do not start with 'test'
-	process.on('unhandledRejection', function (reason) {
+	process.on('unhandledRejection', reason => {
 		if ((reason.message || reason).indexOf('test') !== 0) {
 			ucErrStr = reason.message || reason;
 		}
@@ -66,7 +66,7 @@ exports.addCheck = function (num) {
 };
 
 // If the check isn't added, throw on exit
-process.once('exit', function () {
+process.once('exit', () => {
 	if (noCallback) {
 		exports.reject('FAILURE, CHECK NOT ADDED');
 	}

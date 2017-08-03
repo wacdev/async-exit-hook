@@ -1,16 +1,16 @@
 'use strict';
-var stub = require('./stub');
-var exitHook = require('./../../index');
+const stub = require('./stub');
+const exitHook = require('./../../index');
 
-exitHook(function () {
+exitHook(() => {
 	stub.called();
 });
 
-exitHook(function () {
+exitHook(() => {
 	stub.called();
 });
 
-process.on('exit', function () {
+process.on('exit', () => {
 	stub.called();
 });
 

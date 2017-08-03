@@ -1,21 +1,21 @@
 'use strict';
-var exitHook = require('./../../index');
-var stub = require('./stub');
+const exitHook = require('./../../index');
+const stub = require('./stub');
 
-exitHook(function (cb) {
-	setTimeout(function () {
+exitHook(cb => {
+	setTimeout(() => {
 		stub.called();
 		cb();
 	}, 50);
 	stub.called();
 });
 
-exitHook(function () {
+exitHook(() => {
 	stub.called();
 });
 
-exitHook.uncaughtExceptionHandler(function (err, cb) {
-	setTimeout(function () {
+exitHook.uncaughtExceptionHandler((err, cb) => {
+	setTimeout(() => {
 		stub.called();
 		cb();
 	}, 50);
@@ -25,7 +25,7 @@ exitHook.uncaughtExceptionHandler(function (err, cb) {
 	stub.called();
 });
 
-process.on('uncaughtException', function () {
+process.on('uncaughtException', () => {
 	// All uncaught exception handlers should be called even though the exit hook handler was registered
 	stub.called();
 });

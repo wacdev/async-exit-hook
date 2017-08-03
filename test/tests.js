@@ -1,10 +1,10 @@
 // Tests have to happen in a subprocess to test the exit functionality
 'use strict';
 
-var fork = require('child_process').fork;
-var path = require('path');
+const fork = require('child_process').fork;
+const path = require('path');
 
-var test = require('ava');
+const test = require('ava');
 
 /**
  * Starts a test file in a subprocess, returns a promise that resolves with the subprocess
@@ -17,7 +17,7 @@ var test = require('ava');
  */
 function testInSub(test, signal) {
 	return new Promise(resolve => {
-		var proc = fork(
+		const proc = fork(
 			path.resolve(__dirname, './cases/' + test + '.js'),
 			{
 				env: process.env,
@@ -25,13 +25,13 @@ function testInSub(test, signal) {
 			}
 		);
 
-		var output = '';
+		let output = '';
 
-		proc.stdout.on('data', function (data) {
+		proc.stdout.on('data', data => {
 			output += data.toString();
 		});
 
-		proc.stderr.on('data', function (data) {
+		proc.stderr.on('data', data => {
 			output += data.toString();
 		});
 
@@ -48,7 +48,7 @@ function testInSub(test, signal) {
 }
 
 test('API: test adding and removing and listing hooks', t => {
-	var exitHook = require('./../');
+	const exitHook = require('./../');
 
 	t.plan(3);
 
@@ -68,47 +68,42 @@ test('API: test adding and removing and listing hooks', t => {
 	t.not(exitHook.hookedEvents().indexOf('SIGBREAK'), -1);
 });
 
-test('sync handlers', t => {
+test('sync handlers', async t => {
 	t.plan(2);
-	return testInSub('sync', 'shutdown')
-		.then(([code, output]) => {
-			t.is(output, 'SUCCESS');
-			t.is(code, 0);
-		});
+	const [code, output] = await testInSub('sync', 'shutdown');
+
+	t.is(output, 'SUCCESS');
+	t.is(code, 0);
 });
 
-test('async handlers', t => {
+test('async handlers', async t => {
 	t.plan(2);
-	return testInSub('async', 'shutdown')
-		.then(([code, output]) => {
-			t.is(output, 'SUCCESS');
-			t.is(code, 0);
-		});
+	const [code, output] = await testInSub('async', 'shutdown');
+
+	t.is(output, 'SUCCESS');
+	t.is(code, 0);
 });
 
-test('async uncaught exception handler', t => {
+test('async uncaught exception handler', async t => {
 	t.plan(2);
-	return testInSub('async-err')
-		.then(([code, output]) => {
-			t.is(output, 'SUCCESS');
-			t.is(code, 0);
-		});
+	const [code, output] = await testInSub('async-err');
+
+	t.is(output, 'SUCCESS');
+	t.is(code, 0);
 });
 
-test('async exit timeout', t => {
+test('async exit timeout', async t => {
 	t.plan(2);
-	return testInSub('async-exit-timeout')
-		.then(([code, output]) => {
-			t.is(output, 'SUCCESS');
-			t.is(code, 0);
-		});
+	const [code, output] = await testInSub('async-exit-timeout');
+
+	t.is(output, 'SUCCESS');
+	t.is(code, 0);
 });
 
-test('unhandled promise rejection', t => {
+test('unhandled promise rejection', async t => {
 	t.plan(2);
-	return testInSub('unhandled-promise')
-		.then(([code, output]) => {
-			t.is(output, 'SUCCESS');
-			t.is(code, 0);
-		});
+	const [code, output] = await testInSub('unhandled-promise');
+
+	t.is(output, 'SUCCESS');
+	t.is(code, 0);
 });
