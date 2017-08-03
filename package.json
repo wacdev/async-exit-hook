@@ -51,11 +51,11 @@
     "event"
   ],
   "devDependencies": {
-    "ava": "^0.16.0",
+    "ava": "^0.21.0",
     "coveralls": "^2.11.14",
-    "nyc": "^8.3.1",
-    "standard-version": "^3.0.0",
-    "xo": "^0.16.0"
+    "nyc": "^11.1.0",
+    "standard-version": "^4.2.0",
+    "xo": "^0.18.2"
   },
   "ava": {
     "files": [
