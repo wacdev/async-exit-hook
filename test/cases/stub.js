@@ -1,5 +1,5 @@
 // Stub to make sure that the required callbacks are called by exit-hook
-
+'use strict';
 let c = 0;
 let noCallback = true;
 
