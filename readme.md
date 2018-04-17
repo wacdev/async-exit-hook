@@ -76,14 +76,13 @@ exitHook.unhandledRejectionHandler(err => {
 // Add the second parameter (callback) to indicate async hooks
 exitHook.uncaughtExceptionHandler((err, callback) => {
     sendErrorToCloudOrWhatever(err) // Returns promise
-        .then(() => { 
-             console.log('Sent err to cloud'); 
-         });
+        .then(() => {
+console.log('Sent err to cloud');
+        })
         .catch(sendError => {
-             console.error('Error sending to cloud: ', err.stack));
+console.error('Error sending to cloud: ', err.stack);
         })
         .then(() => callback);
-    });
 });
 
 // Add exit hooks for a signal or custom message:
