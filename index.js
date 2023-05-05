@@ -37,7 +37,7 @@ function exit(exit, code, err) {
 	// Runs a single hook
 	function runHook(syncArgCount, err, hook) {
 		// Cannot perform async hooks in `exit` event
-		if (exit && hook.length > syncArgCount) {
+		if (exit && hooks.length > syncArgCount) {
 			// Hook is async, expects a finish callback
 			waitingFor++;
 
